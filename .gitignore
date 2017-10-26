@@ -1,0 +1,9 @@
+# Emacs backups & buffers
+*~
+#*#
+
+# PyCharm
+/.idea
+
+# Python compiled files
+*.pyc
