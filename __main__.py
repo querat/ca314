@@ -1,9 +1,9 @@
 import  wx
-from    Display     import Display
+from    Game    import Game
 
 def main():
     app = wx.App()
-    display = Display()
+    game = Game()
     app.MainLoop()
 
 main()
