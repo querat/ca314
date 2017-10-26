@@ -3,7 +3,6 @@ from    Cell   import Cell
 
 class Board:
 
-
     def __init__(self):
         # 2D array of Cells
         self.matrix = [[Cell(x, y) for x in range(Config.NB_COLS)] for y in range(Config.NB_ROWS) ]

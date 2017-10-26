@@ -1,5 +1,6 @@
 import  wx
 import  Config
+from    Bitmap  import Bitmap
 from    Cell    import Cell
 
 
@@ -10,11 +11,11 @@ class Display(wx.Frame):
 
         self.bitmapPxWidth      = Config.NB_COLS * Config.SPRITE_SIZE
         self.bitmapPxHeight     = Config.NB_ROWS * Config.SPRITE_SIZE
-
+        #self.panel              = wx.Panel(self)
         # Bitmap holder to draw the board on
-        self.shownBoardBitmap   = wx.StaticBitmap(self, wx.ID_ANY)
+        self.shownBoardBitmap       = Bitmap(self, wx.ID_ANY)
         # Bitmap to draw on and render to the shown bitmap
-        self.drawableBoardBitmap = wx.EmptyBitmap(self.bitmapPxWidth, self.bitmapPxHeight)
+        self.drawableBoardBitmap    = wx.EmptyBitmap(self.bitmapPxWidth, self.bitmapPxHeight)
 
         self.shownBoardBitmap.SetBitmap(self.drawableBoardBitmap)
 
@@ -22,12 +23,18 @@ class Display(wx.Frame):
         self.verticalSizer = wx.BoxSizer(wx.VERTICAL)
         self.doGuiLayout()
 
+        self.bindEvents()
+        self.CenterOnScreen()
+        self.SetFocus()
         self.Show()
 
     # Fit everything visually
     def doGuiLayout(self):
         self.verticalSizer.Add(self.shownBoardBitmap, 1, wx.EXPAND | wx.ALL)
         self.SetSizerAndFit(self.verticalSizer)
+
+    def bindEvents(self):
+        self.Bind(wx.EVT_LEFT_DOWN, self.onBoardClicked)
 
     def drawBoard(self, board):
         for row in board.getMatrix():
@@ -46,10 +53,21 @@ class Display(wx.Frame):
         )
         dc.SelectObject(wx.NullBitmap)
 
+    def convertCoordinatesFromPxToCell(self, pxPos):
+          return int(pxPos / Config.SPRITE_SIZE)
+
+    def onBoardClicked(self, evt):
+        clickedCellX = self.convertCoordinatesFromPxToCell(evt.X)
+        clickedCellY = self.convertCoordinatesFromPxToCell(evt.Y)
+
+        print("Board clicked (x%d y%d), cell (x%d y%d)" % (
+            evt.X
+          , evt.Y
+          , clickedCellX
+          , clickedCellY
+        ))
+
+    def onDummyCallback(self, *_):
+        print("Dummy callback")
+
 # !class Display
-
-
-if __name__ == "__main__":
-    app = wx.App()
-    display = Display()
-    app.MainLoop()
