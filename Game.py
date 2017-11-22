@@ -1,12 +1,12 @@
 import wx
-from Display    import Display
-from Board      import Board
+from Display import Display
+from Board import Board
 
 class Game:
 
     def __init__(self):
-        self.display    = Display()
-        self.board      = Board()
+        self.display = Display()
+        self.board = Board()
         self.display.drawBoard(self.board)
 
 
