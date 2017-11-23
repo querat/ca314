@@ -3,7 +3,7 @@ import heapq
 import numpy as np
 
 
-def fast_fill(input_array, four_way=False):
+def fast_fill(input_array):
     h_max = np.nanmax(input_array) + 100
 
     # Build mask of cells with data not on the edge of the image
@@ -28,26 +28,13 @@ def fast_fill(input_array, four_way=False):
         for t_row, t_col in np.transpose(np.where(edge_mask))]
     heapq.heapify(fill_heap)
 
-    def neighbors(row, col, four_way=False):
-        """Return indices of adjacent cells"""
-        if four_way:
-            return [
-                (row - 1, col), (row, col + 1),
-                (row + 1, col), (row, col - 1)]
-        else:
-            return [
-                (row - 1, col), (row - 1, col + 1),
-                (row, col + 1), (row + 1, col + 1),
-                (row + 1, col), (row + 1, col - 1),
-                (row, col - 1), (row - 1, col - 1)]
-
     # Iterate until priority queue is empty
     while True:
         try:
             h_crt, t_row, t_col, edge_flag = get(fill_heap)
         except IndexError:
             break
-        for n_row, n_col in neighbors(t_row, t_col, four_way):
+        for n_row, n_col in neighbors(t_row, t_col):
             # Skip cell if outside array edges
             if edge_flag:
                 try:
@@ -61,35 +48,15 @@ def fast_fill(input_array, four_way=False):
                 put(fill_heap, (output_array[n_row, n_col], n_row, n_col, False))
     return output_array
 
+
+def neighbors(row, col):
+        """Return indices of adjacent cells"""
+        return [
+            (row - 1, col), (row, col + 1),
+            (row + 1, col), (row, col - 1)]
+
 def np_binary_erosion(input_array,
                       structure=np.ones((3, 3)).astype(np.bool)):
-    """
-    Multi-dimensional binary erosion with a given structuring element.
-
-    Binary erosion is a mathematical morphology operation used for image
-    processing.
-
-    Notes
-    -----
-    Pure NumPy replacement for SciPy ndimage.binary_erosion()
-    No error checking on input array (type)
-    No error checking on structure element (# of dimensions, shape, type, etc.)
-
-    Parameters
-    ----------
-    input : array_like
-        Binary image to be eroded. Non-zero (True) elements form
-        the subset to be eroded.
-    structure : array_like, optional
-        Structuring element used for the erosion. Non-zero elements are
-        considered True. If no structuring element is provided, an element
-        is generated with a square connectivity equal to one.
-
-    Returns
-    -------
-    binary_erosion: Erosion of the input by the stucturing element
-
-    """
     rows, cols = input_array.shape
 
     # Pad output array (binary_erosion) with extra cells around the edge

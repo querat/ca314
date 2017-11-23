@@ -1,4 +1,7 @@
+import numpy as np
 import  Config
+import fill
+import copy
 from    Cell   import Cell
 
 class Board:
@@ -8,6 +11,7 @@ class Board:
         self.matrix = [[Cell(x, y) for x in range(Config.NB_COLS)] for y in range(Config.NB_ROWS) ]
         # will disappear
         self.testPopulate()
+        self.calculScore()
 
     # Will disappear, just testing sprites
     def testPopulate(self):
@@ -19,32 +23,48 @@ class Board:
     def getMatrix(self):
         return self.matrix
 
+    def getPlayersScores(self, finalArray):
+        whitePlayerScore = 7.5
+        blackPlayerScore = 0.0
+
+        for y in range(0, len(finalArray)):
+            for x in range(0, len(finalArray[y])):
+                if finalArray[y,x] == Cell.Status.BLACK.value:
+                    blackPlayerScore += 1.0
+                elif finalArray[y,x] == Cell.Status.WHITE.value:
+                    whitePlayerScore += 1.0
+        return whitePlayerScore, blackPlayerScore
+
     def getSimpleArray(self):
         simpleArray = []
         for row in self.matrix:
             simpleRow = []
             for cell in row:
-                simpleRow.append(cell.status)
+                simpleRow.append(cell.status.value)
             simpleArray.append(simpleRow)
-        return simpleArray;
+        return simpleArray
 
     def replace(self, array, val1 , val2):
-        for row in array:
-            for cell in row:
-                if (cell == val1 || cell == val2):
-                    cell = (cell == val1) ? (val2) : (val1)
+        for y, row in enumerate(array):
+            for x, cell in enumerate(row):
+                if cell != Cell.Status.EMPTY.value:
+                    array[y][x] = val2 if cell == val1 else val1
+        return array
 
     def calculScore(self):
         blackSimpleArray = self.getSimpleArray()
-        whiteSimpleArray = self.replace(list(blackSimpleArray), Cell.Status.BLACK, Cell.Status.WHITE)
+        whiteSimpleArray = self.replace(copy.deepcopy(blackSimpleArray), Cell.Status.BLACK.value, Cell.Status.WHITE.value)
 
-        blackNpArray = np.array(blackSimpleArray).astype(float)
-        whiteNpArray = np.array(whiteSimpleArray).astype(float)
+        resultBlackArray = fill.fast_fill(np.array(blackSimpleArray))
+        resultWhiteArray = fill.fast_fill(np.array(whiteSimpleArray))
 
-        resultBlackArray = fill.fast_fill(blackNpArray, four_way=True)
-        resultWhiteArray = fill.fast_fill(whiteNpArray, four_way=True)
+        finalArray = np.array([[0 for x in range(Config.NB_COLS)] for y in range(Config.NB_ROWS)])
 
-        print("Results:\n");
-        print(resultBlackArray)
-        print("")
-        print(resultWhiteArray);
+        for y in range(0, len(resultWhiteArray)):
+            for x in range(0, len(resultWhiteArray[y])):
+                if resultBlackArray[y,x] == resultWhiteArray[y,x] and resultBlackArray[y,x] != 0:
+                    finalArray[y,x] = 0
+                else:
+                    finalArray[y,x] = resultBlackArray[y,x]
+
+        print(self.getPlayersScores(finalArray))

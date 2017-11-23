@@ -15,7 +15,7 @@ class Display(wx.Frame):
         # Bitmap holder to draw the board on
         self.shownBoardBitmap       = Bitmap(self, wx.ID_ANY)
         # Bitmap to draw on and render to the shown bitmap
-        self.drawableBoardBitmap    = wx.EmptyBitmap(self.bitmapPxWidth, self.bitmapPxHeight)
+        self.drawableBoardBitmap    = wx.Bitmap(self.bitmapPxWidth, self.bitmapPxHeight)
         self.shownBoardBitmap.SetBitmap(self.drawableBoardBitmap)
 
         self.textPlayerTurn = wx.StaticText(self, label="White player", style=wx.BORDER_NONE)
