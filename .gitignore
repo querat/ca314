@@ -9,3 +9,5 @@
 *.pyc
 
 .DS_Store
+
+venv
