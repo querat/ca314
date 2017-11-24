@@ -55,6 +55,7 @@ def neighbors(row, col):
             (row - 1, col), (row, col + 1),
             (row + 1, col), (row, col - 1)]
 
+
 def np_binary_erosion(input_array,
                       structure=np.ones((3, 3)).astype(np.bool)):
     rows, cols = input_array.shape

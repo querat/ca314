@@ -13,6 +13,7 @@ class Board:
         # self.testPopulate()
         self.calculScore()
 
+
     # Will disappear, just testing sprites
     def testPopulate(self):
         from random import randint
@@ -20,8 +21,10 @@ class Board:
             for cell in row:
                 cell.setStatus(Cell.Color(randint(0, 2)))
 
+
     def getCell(self, x, y):
         return self.matrix[x][y]
+
 
     def isFull(self):
         for row in self.matrix:
@@ -30,6 +33,8 @@ class Board:
                     return False
         return True
 
+
+    # in the Board class
     def addToken(self, x, y, color):
         if self.getCell(x, y).getColor() != Cell.Color.EMPTY:
             print("Impossible to place a token on %d:%d (A piece is already there)" % (x, y))
@@ -38,8 +43,15 @@ class Board:
         print("Added a cell on %d:%d" % (x, y))
         return True
 
+
+    def removeCapturedTokens(self):
+        # TODO
+        pass
+
+
     def getMatrix(self):
         return self.matrix
+
 
     def getPlayersScores(self, finalArray):
         whitePlayerScore = 7.5
@@ -53,6 +65,7 @@ class Board:
                     whitePlayerScore += 1.0
         return whitePlayerScore, blackPlayerScore
 
+
     def getSimpleArray(self):
         simpleArray = []
         for row in self.matrix:
@@ -62,12 +75,14 @@ class Board:
             simpleArray.append(simpleRow)
         return simpleArray
 
+
     def replace(self, array, val1 , val2):
         for y, row in enumerate(array):
             for x, cell in enumerate(row):
                 if cell != Cell.Color.EMPTY.value:
                     array[y][x] = val2 if cell == val1 else val1
         return array
+
 
     def calculScore(self):
         blackSimpleArray = self.getSimpleArray()

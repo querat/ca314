@@ -8,6 +8,7 @@ class Bitmap(wx.StaticBitmap):
         self.parent = parent
         self.Bind(wx.EVT_LEFT_DOWN, self.onBitmapClicked)
 
+
     def onBitmapClicked(self, evt):
         #self.parent.onBoardClicked(evt)
         wx.PostEvent(self.parent, evt)

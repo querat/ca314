@@ -1,4 +1,5 @@
 import  wx
+import  Game
 import  Config
 import  Event
 from    Bitmap  import Bitmap
@@ -21,8 +22,11 @@ class Display(wx.Frame):
         self.drawableBoardBitmap    = wx.EmptyBitmap(self.bitmapPxWidth, self.bitmapPxHeight)
         self.shownBoardBitmap.SetBitmap(self.drawableBoardBitmap)
 
-        self.textPlayerTurn = wx.StaticText(self, label="White player", style=wx.BORDER_NONE)
-        self.textTurnNumber = wx.StaticText(self, label="Turn #0")
+        # textboxes displayed at the top of the side panel on the right side of the window
+        self.textPlayerTurn = wx.StaticText(self, label="Black player's turn")
+        self.textTurnNumber = wx.StaticText(self, label="Turn #1")
+
+        # Buttons located at the bottom of the sidepanel
         self.buttonPass     = wx.Button(self, label="Pass")
         self.buttonGiveUp   = wx.Button(self, label="Give up")
 
@@ -31,6 +35,7 @@ class Display(wx.Frame):
         self.verticalSidePanelSizer = wx.BoxSizer(wx.VERTICAL)
         self.doGuiLayout()
 
+        # Menus at the top of the window ("File", etc...)
         self.menu = wx.MenuBar()
         self.menuFile = wx.Menu()
         self.menuFileNewGame = self.menuFile.Append(wx.ID_ADD , "New Game", "Restarts the game")
@@ -40,6 +45,9 @@ class Display(wx.Frame):
 
         self.bindEvents()
 
+        # Twice because on double displays, calling this method only once centers the window
+        # in between the two screens (this is dumb)
+        self.CenterOnScreen()
         self.CenterOnScreen()
         self.SetFocus()
         self.Show()
@@ -47,7 +55,6 @@ class Display(wx.Frame):
 
     # Fit everything visually
     def doGuiLayout(self):
-
         # Layout for the player and turn textBoxes
         self.verticalSidePanelSizer.Add(self.textPlayerTurn, 1, wx.CENTER | wx.ALL, 16)
         self.verticalSidePanelSizer.Add(wx.StaticLine(self), 0.1, wx.EXPAND | wx.ALL, 16)
@@ -82,6 +89,7 @@ class Display(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onNewGameMenu, self.menuFileNewGame)
 
 
+    # in the Display class
     def onNewGameMenu(self, *_):
         print("onNewGameMenu()")
         confirmNewGameDialog = wx.MessageDialog(
@@ -94,13 +102,13 @@ class Display(wx.Frame):
         confirmNewGameDialog.Destroy()
         if userAnswer == wx.ID_OK:
             print("User restarting the game ...")
-            raise NotImplementedError
+            wx.PostEvent(self.game, Event.EvtNewGameRequested())
 
 
     def onExitMenu(self, *_):
         confirmExitDialog = wx.MessageDialog(
             self
-            , "Do you really want to exit the game ?"
+            , "Do you want to exit the game ?"
             , "Exit"
             , wx.OK | wx.CANCEL | wx.ICON_NONE
         )
@@ -114,9 +122,11 @@ class Display(wx.Frame):
         print("onPassClicked()")
         wx.PostEvent(self.game, Event.EvtPlayerPass())
 
+
     def onGiveUpClicked(self, *args):
         print("onGiveUpClicked()")
-        raise NotImplementedError
+        wx.PostEvent(self.game, Event.EvtPlayerGiveUp())
+
 
     def drawBoard(self, board):
         for row in board.getMatrix():
@@ -151,6 +161,21 @@ class Display(wx.Frame):
           , clickedCellY
         ))
         wx.PostEvent(self.game, Event.EvtPlayerPlay(position=wx.Point(clickedCellX, clickedCellY)))
+
+
+    def setPlayerTurnText(self, string):
+        self.textPlayerTurn.SetLabel(string)
+
+
+    def setTurnNumber(self, newNumber):
+        self.textTurnNumber.SetLabel("Turn #%d" % (newNumber,))
+
+
+    def showPopup(self, message):
+        popup = wx.MessageDialog(self, message)
+        popup.ShowModal()
+        popup.Destroy()
+
 
     def onDummyCallback(self, *_):
         print("Dummy callback")
