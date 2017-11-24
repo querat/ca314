@@ -1,13 +1,16 @@
 import  wx
 import  Config
+import  Event
 from    Bitmap  import Bitmap
 from    Cell    import Cell
 
 
 class Display(wx.Frame):
 
-    def __init__(self):
+    def __init__(self, game):
         wx.Frame.__init__(self, None, wx.ID_ANY, Config.TITLE)
+
+        self.game = game
 
         self.bitmapPxWidth      = Config.NB_COLS * Config.SPRITE_SIZE
         self.bitmapPxHeight     = Config.NB_ROWS * Config.SPRITE_SIZE
@@ -15,7 +18,7 @@ class Display(wx.Frame):
         # Bitmap holder to draw the board on
         self.shownBoardBitmap       = Bitmap(self, wx.ID_ANY)
         # Bitmap to draw on and render to the shown bitmap
-        self.drawableBoardBitmap    = wx.Bitmap(self.bitmapPxWidth, self.bitmapPxHeight)
+        self.drawableBoardBitmap    = wx.EmptyBitmap(self.bitmapPxWidth, self.bitmapPxHeight)
         self.shownBoardBitmap.SetBitmap(self.drawableBoardBitmap)
 
         self.textPlayerTurn = wx.StaticText(self, label="White player", style=wx.BORDER_NONE)
@@ -61,7 +64,7 @@ class Display(wx.Frame):
 
         # Overall layout of the window
         # Board drawn on the left side
-        self.horizontalSizer.Add(self.shownBoardBitmap      , 2, wx.EXPAND | wx.ALL)
+        self.horizontalSizer.Add(self.shownBoardBitmap      , 3, wx.EXPAND | wx.ALL, 32)
         # Side panel drawn on the right side
         self.horizontalSizer.Add(self.verticalSidePanelSizer, 1, wx.EXPAND | wx.ALL)
         # Apply the layout
@@ -109,13 +112,11 @@ class Display(wx.Frame):
 
     def onPassClicked(self, *args):
         print("onPassClicked()")
-        raise NotImplementedError
-
+        wx.PostEvent(self.game, Event.EvtPlayerPass())
 
     def onGiveUpClicked(self, *args):
         print("onGiveUpClicked()")
         raise NotImplementedError
-
 
     def drawBoard(self, board):
         for row in board.getMatrix():
@@ -149,7 +150,7 @@ class Display(wx.Frame):
           , clickedCellX
           , clickedCellY
         ))
-
+        wx.PostEvent(self.game, Event.EvtPlayerPlay(position=wx.Point(clickedCellX, clickedCellY)))
 
     def onDummyCallback(self, *_):
         print("Dummy callback")
