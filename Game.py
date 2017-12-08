@@ -98,6 +98,15 @@ class Game(wx.EvtHandler):
         if self.ConsecutiveTurnsPassed < 2:
             return
         msg = "Game is ending: both players passed in a row !"
+        score = self.board.calculScore()
+        msg += "\nWhite player's score : " + str(score[0])
+        msg += "\nBlack player's score : " + str(score[1])
+        if score[0] > score[1]:
+            msg += "\nWhite player win the game!"
+        elif score[0] < score[1]:
+            msg += "\nBlack player win the game!"
+        else:
+            msg += "\nEquality!"
         print(msg)
         self.display.showPopup(msg)
         self.onGameEnding()

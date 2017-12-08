@@ -100,4 +100,4 @@ class Board:
                 else:
                     finalArray[y,x] = resultBlackArray[y,x]
 
-        print(self.getPlayersScores(finalArray))
+        return self.getPlayersScores(finalArray)
